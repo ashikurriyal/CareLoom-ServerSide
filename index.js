@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-
 const app = express()
 require('dotenv').config()
 const port = process.env.PORT || 5300;
@@ -10,7 +9,7 @@ app.use(cors({
     origin: [
         'http://localhost:5173',
     ]
-}))
+}));
 
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -40,13 +39,14 @@ async function run() {
 
 
     //users
-    app.get('/users', async (req, res) => {
-        const result = await usersCollection.find().toArray()
-        res.send(result)
-    })
+    // app.get('/users', async (req, res) => {
+    //     const result = await usersCollection.find().toArray()
+    //     res.send(result)
+    // })
 
-    app.post('/users', async (req,res) => {
+    app.post('/user', async (req,res) => {
         const assignment = req.body;
+        // console.log(assignment)
         const result = await usersCollection.insertOne(assignment)
         res.send(result)
     })
@@ -56,7 +56,13 @@ async function run() {
 
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
+app.get('/', (req,res) => {
+    res.send('Care Loom Server is Ongoing')
+})
+app.listen(port, () => {
+    console.log(`Server is running on port${port}`);
+})
