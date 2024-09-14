@@ -38,20 +38,26 @@ async function run() {
     
 
 
-    //users
-    // app.get('/users', async (req, res) => {
-    //     const result = await usersCollection.find().toArray()
-    //     res.send(result)
-    // })
+    //Users Related API's
 
-    app.post('/user', async (req,res) => {
-        const assignment = req.body;
-        // console.log(assignment)
-        const result = await usersCollection.insertOne(assignment)
+    app.get('/users', async (req, res) => {
+        const result = await usersCollection.find().toArray()
         res.send(result)
     })
 
-    //admin role
+    app.post('/user', async (req,res) => {
+        const user = req.body;
+        const query = {email: user?.email}
+        const existingUser = await usersCollection.findOne(query)
+        if(existingUser) {
+            return res.send({message: 'Users already exists', insertedId: null})
+        }
+        const result = await usersCollection.insertOne(user)
+        res.send(result)
+    })
+
+    //Admin Related API's
+    
     app.patch('/users/:id', async (req, res) => {
         const id = req.params.id
         const filter = { _id: new ObjectId(id) }
