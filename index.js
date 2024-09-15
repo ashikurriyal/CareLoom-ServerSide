@@ -35,6 +35,7 @@ async function run() {
     //Collections
 
     const usersCollection = client.db('CareLoomDB').collection('users')
+    const careGiverRequestCollection = client.db('CareLoomDB').collection('careGiverRequest')
     
 
 
@@ -91,6 +92,25 @@ async function run() {
         }
         res.send({ admin })
     })
+
+
+
+    //CareGiver Related API's
+
+    //apply as caregiver
+
+    app.post('/careGiverRequest', async(req,res) => {
+        const applyRequest = req.body;
+        const result = await careGiverRequestCollection.insertOne(applyRequest);
+        res.send(result)
+    })
+
+    //careGiver request data on admin side
+    app.get('/allCareGiverApplyReq', async(req, res) => {
+        const result = await careGiverRequestCollection.find().toArray()
+        res.send(result)
+    })
+
 
     
 
