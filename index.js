@@ -4,7 +4,7 @@ const app = express()
 require('dotenv').config()
 const port = process.env.PORT || 5300;
 
-app.use(express.json())
+app.use(express.json());
 app.use(cors({
     origin: [
         'http://localhost:5173',
@@ -93,6 +93,20 @@ async function run() {
         res.send({ admin })
     })
 
+    //verify or reject caregiver
+    // app.patch('/users/:id', async (req, res) => {
+    //     const id = req.params.id;
+    //     const { status } = req.body; // Get the status from the request body
+    //     const filter = { _id: new ObjectId(id) };
+    //     const updatedDoc = {
+    //         $set: {
+    //             status: status // Update the status based on the request body
+    //         }
+    //     };
+    //     const result = await careGiverRequestCollection.updateOne(filter, updatedDoc);
+    //     res.send(result);
+    // });
+
 
 
     //CareGiver Related API's
@@ -102,7 +116,7 @@ async function run() {
     app.post('/careGiverRequest', async(req,res) => {
         const applyRequest = req.body;
         const result = await careGiverRequestCollection.insertOne(applyRequest);
-        res.send(result)
+        res.send(result);
     })
 
     //careGiver request data on admin side
@@ -124,7 +138,7 @@ async function run() {
 }
 run().catch(console.dir);
 app.get('/', (req,res) => {
-    res.send('Care Loom Server is Ongoing')
+    res.send('Care Loom Server is Ongoing');
 })
 app.listen(port, () => {
     console.log(`Server is running on port${port}`);
