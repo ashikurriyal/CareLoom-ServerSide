@@ -39,6 +39,9 @@ async function run() {
     const careGiverRequestCollection = client
       .db("CareLoomDB")
       .collection("careGiverRequest");
+    const careRequestCollection = client
+      .db("CareLoomDB")
+      .collection("careRequest");
 
     //Users Related API's
 
@@ -59,20 +62,44 @@ async function run() {
     });
 
     //user post for care
-    
-
 
     //Collectuser
 
     app.get("/collectUser/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+      //   console.log(email);
       const query = { email: email };
-      console.log(query);
+      //   console.log(query);
 
       const result = await usersCollection.findOne(query);
       res.send(result);
     });
+
+    //request for care
+
+    app.post("/requestForCare", async (req, res) => {
+      const request = req.body;
+      const result = await careRequestCollection.insertOne(request);
+      res.send(result);
+    });
+
+    app.get('/requestForCare', async (req, res) => {
+        const email = req.query.email;
+        // console.log(email)
+        const query = {careGiverEmail: email}
+        const result = await careRequestCollection.find(query).toArray()
+        res.send(result)
+    })
+
+
+    //my request api
+    app.get('/myCareRequest/:email', async (req,res) => {
+        const email = await req.params.email;
+        console.log(req.params)
+        const query = {userEmail : email}
+        const result = await careRequestCollection.find(query).toArray()
+        res.send(result)
+    })
 
     //Admin Related API's
 
@@ -96,7 +123,7 @@ async function run() {
       if (user) {
         admin = user?.role === "admin";
       }
-      res.send({ admin });
+      res.send({ admin })
     });
 
     // verify or reject caregiver
@@ -142,11 +169,46 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/verifiedCareGiver/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = { careGiverEmail: email };
+      const result = await careGiverRequestCollection.findOne(query);
+      console.log(result);
+      res.send(result);
+    });
+
     //careGiver request data on admin side
     app.get("/allCareGiverApplyReq", async (req, res) => {
       const result = await careGiverRequestCollection.find().toArray();
       res.send(result);
     });
+
+    //
+    app.get("/collectCare/:care", async (req, res) => {
+      const care = await req.params.care;
+      // console.log(care)
+      const query = { expertise: care };
+      console.log(care);
+      const result = await careGiverRequestCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.patch("/acceptedCareClient/:id", async (req, res) => {
+        const id = req.params.id;
+        const { careStatus } = req.body; // Get the status from the request body
+        const filter = { _id: new ObjectId(id) }; // Create filter with ObjectId
+        const updatedDoc = {
+          $set: {
+            careStatus: careStatus, // Update the status based on the request body
+          },
+        };
+        const result = await careRequestCollection.updateOne(
+          filter,
+          updatedDoc
+        );
+        res.send(result);
+      });
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
